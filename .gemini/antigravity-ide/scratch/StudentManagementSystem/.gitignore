@@ -1,0 +1,87 @@
+# ==========================================
+# 1. Secret & Environment Files
+# ==========================================
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+*.pem
+*.key
+*.pfx
+*.crt
+*.keystore
+
+# Database local
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# 2. Node.js & React (Frontend)
+# ==========================================
+node_modules/
+/src/frontend/student-portal-react/node_modules/
+/src/frontend/student-portal-react/build/
+/src/frontend/student-portal-react/dist/
+dist/
+build/
+.npm/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ==========================================
+# 3. .NET / C# (Backend & Services)
+# ==========================================
+bin/
+obj/
+**/bin/
+**/obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]uild/
+[Tt]est[Rr]esults/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Visual Studio / Rider / OmniSharp
+.vs/
+.idea/
+*.userprefs
+
+# ==========================================
+# 4. Java / Spring (if applicable)
+# ==========================================
+target/
+**/target/
+.gradle/
+*.class
+*.jar
+*.war
+
+# ==========================================
+# 5. OS & Editor System Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# VS Code (Except shared configs)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

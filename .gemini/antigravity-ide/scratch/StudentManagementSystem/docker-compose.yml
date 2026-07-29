@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: student_db,course_db,enrollment_db,auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  auth-service:
+    build:
+      context: ./src/services/AuthService
+    container_name: auth_service
+    ports:
+      - "5004:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=auth_db;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+
+  student-service:
+    build:
+      context: ./src/services/StudentService
+    container_name: student_service
+    ports:
+      - "5001:80"
+    environment:
+      - ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=student_db;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+
+  course-service:
+    build:
+      context: ./src/services/CourseService
+    container_name: course_service
+    ports:
+      - "5002:80"
+    environment:
+      - ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=course_db;Username=postgres;Password=postgres
+    depends_on:
+      - postgres
+
+  enrollment-service:
+    build:
+      context: ./src/services/EnrollmentService
+    container_name: enrollment_service
+    ports:
+      - "5003:80"
+    environment:
+      - ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=enrollment_db;Username=postgres;Password=postgres
+      - Services__StudentServiceUrl=http://student-service:80
+      - Services__CourseServiceUrl=http://course-service:80
+    depends_on:
+      - postgres
+      - student-service
+      - course-service
+
+  api-gateway:
+    build:
+      context: ./src/gateway/ApiGateway
+    container_name: api_gateway
+    ports:
+      - "5000:80"
+    environment:
+      - ReverseProxy__Clusters__authCluster__Destinations__destination1__Address=http://auth-service:80
+      - ReverseProxy__Clusters__studentCluster__Destinations__destination1__Address=http://student-service:80
+      - ReverseProxy__Clusters__courseCluster__Destinations__destination1__Address=http://course-service:80
+      - ReverseProxy__Clusters__enrollmentCluster__Destinations__destination1__Address=http://enrollment-service:80
+    depends_on:
+      - auth-service
+      - student-service
+      - course-service
+      - enrollment-service
+
+volumes:
+  postgres_data:
